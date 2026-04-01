@@ -14,7 +14,7 @@ export const analyzeNutritionNLP = async (text) => {
       "calories": number,
       "protein": number (in grams),
       "carbs": number (in grams),
-      "fat": number (in grams)
+      "fats": number (in grams)
     }
     If you're unsure, provide your best estimate. Do not include any text other than the JSON.
     `;
@@ -28,7 +28,18 @@ export const analyzeNutritionNLP = async (text) => {
             })
         });
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Gemini API Error Details:", errorData);
+            throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+        }
+
         const data = await response.json();
+        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+            console.error("Unexpected Gemini response structure:", data);
+            throw new Error("Invalid response from Gemini API");
+        }
+
         const responseText = data.candidates[0].content.parts[0].text;
         
         // Extract JSON (sometimes Gemini wraps it in code blocks)
@@ -84,7 +95,7 @@ export const initNutritionModule = () => {
                         </div>
                         <div class="stat-item">
                             <span class="label">שומן</span>
-                            <span class="value">${result.fat}g</span>
+                            <span class="value">${result.fats}g</span>
                         </div>
                     </div>
                     <button id="save-log" class="btn-primary" style="margin-top: 1rem;">שמור ביומן</button>
@@ -99,7 +110,8 @@ export const initNutritionModule = () => {
             });
 
         } catch (error) {
-            alert('שגיאה בניתוח הארוחה. וודא שמפתח ה-API תקין.');
+            console.error("Detailed Nutrition Error:", error);
+            alert(`שגיאה בניתוח הארוחה: ${error.message}. בדוק את הקונסול לפרטים נוספים.`);
         } finally {
             analyzeBtn.disabled = false;
             analyzeBtn.textContent = 'נתח ארוחה';

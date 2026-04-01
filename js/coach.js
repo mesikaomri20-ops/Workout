@@ -34,11 +34,22 @@ export const getCoachResponse = async (userMessage) => {
             })
         });
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Gemini Coach API Error Details:", errorData);
+            throw new Error(`Gemini API error: ${response.status}`);
+        }
+
         const data = await response.json();
+        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+            console.error("Unexpected Gemini Coach response structure:", data);
+            throw new Error("Invalid response from Gemini API");
+        }
+
         return data.candidates[0].content.parts[0].text;
     } catch (error) {
         console.error("Coach Error:", error);
-        return "מצטער, הייתה לי שגיאה בחיבור למערכת ה-AI. אנא בדוק את מפתח ה-API שלך.";
+        return `מצטער, הייתה לי שגיאה בחיבור למערכת ה-AI: ${error.message}. אנא בדוק את הקונסול לפרטים נוספים.`;
     }
 };
 
