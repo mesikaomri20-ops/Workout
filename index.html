@@ -76,8 +76,17 @@
                 <h2>תיעוד אימון</h2>
                 <form id="workout-form">
                     <div class="form-group">
+                        <label>תאריך אימון</label>
+                        <input type="date" id="workout-date">
+                    </div>
+                    <div class="form-group">
                         <label>סוג אימון</label>
-                        <input type="text" id="workout-type" placeholder="לדוגמה: אימון כוח גומיות">
+                        <div class="input-with-action">
+                            <select id="workout-type-select">
+                                <option value="">בחר סוג אימון...</option>
+                            </select>
+                            <button type="button" id="manage-types-btn" class="btn-icon-small" title="נהל סוגי אימון">+</button>
+                        </div>
                     </div>
                     <div class="summary-stats">
                         <div class="form-group">
@@ -185,6 +194,23 @@
             <h2>התחברות</h2>
             <p>אנא התחבר כדי לסנכרן את הנתונים שלך</p>
             <button id="google-login" type="button" class="btn-primary">התחבר עם Google</button>
+        </div>
+    </div>
+
+    <div id="manage-types-modal" class="modal">
+        <div class="modal-content luxury-card">
+            <h2>ניהול סוגי אימון</h2>
+            <div class="form-group">
+                <label>סוג חדש</label>
+                <div class="input-with-action">
+                    <input type="text" id="new-workout-type" placeholder="למשל: אימון רגליים">
+                    <button type="button" id="add-workout-type-btn" class="btn-primary-small">הוסף</button>
+                </div>
+            </div>
+            <ul id="workout-types-list" class="luxury-list">
+                <!-- Workout types will be listed here -->
+            </ul>
+            <button type="button" id="close-types-modal" class="btn-secondary">סגור</button>
         </div>
     </div>
 

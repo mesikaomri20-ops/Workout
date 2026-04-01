@@ -59,4 +59,29 @@ export const getNutritionHistory = async (limitCount = 10) => {
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+// Workout Types Functions
+export const saveWorkoutType = async (typeName) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const typesCollectionRef = collection(db, "users", user.uid, "workout_types");
+    await addDoc(typesCollectionRef, { name: typeName, createdAt: new Date() });
+};
+
+export const getWorkoutTypes = async () => {
+    const user = auth.currentUser;
+    if (!user) return [];
+    const typesCollectionRef = collection(db, "users", user.uid, "workout_types");
+    const q = query(typesCollectionRef, orderBy("createdAt", "asc"));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+export const deleteWorkoutType = async (typeId) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const typeDocRef = doc(db, "users", user.uid, "workout_types", typeId);
+    const { deleteDoc } = await import("firebase/firestore");
+    await deleteDoc(typeDocRef);
+};
+
 export { auth, db, provider, signInWithPopup };
