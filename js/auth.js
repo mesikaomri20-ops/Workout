@@ -1,11 +1,4 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
-import { firebaseConfig } from "./config.js";
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+import { auth, provider, signInWithPopup } from './db.js';
 
 export const loginWithGoogle = async () => {
     try {
@@ -13,25 +6,12 @@ export const loginWithGoogle = async () => {
         return result.user;
     } catch (error) {
         console.error("Auth Error:", error);
-        throw error;
-    }
-};
-
-export const logout = () => signOut(auth);
-
-export const observeAuth = (callback) => {
-    onAuthStateChanged(auth, callback);
-};
-
-export { auth };
-export const loginWithGoogle = async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        return result.user;
-    } catch (error) {
-        console.error("Auth Error:", error);
-        // השורה הזו תגיד לנו בדיוק מה קורה:
+        // זה יקפיץ הודעה אם גוגל עדיין חוסם אותנו
         alert("שגיאת התחברות: " + error.code + "\n" + error.message);
         throw error;
     }
+};
+
+export const logoutUser = () => {
+    return auth.signOut();
 };
