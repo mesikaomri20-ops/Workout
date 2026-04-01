@@ -1,15 +1,15 @@
-// Firebase Configuration
-// המערכת תמשוך אוטומטית את המפתחות שהגדרת ב-Vercel
+// Firebase Configuration - Hardcoded for immediate fix
 export const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: "AIzaSyC6-XIIXt4yNnRWhXGbWBFx9keiUMBeKcU",
+  authDomain: "workout-31162.firebaseapp.com",
+  projectId: "workout-31162",
+  storageBucket: "workout-31162.firebasestorage.app",
+  messagingSenderId: "726599082881",
+  appId: "1:726599082881:web:94b3ef1598c64f10063e80"
 };
 
 // Gemini API Configuration
+// עומרי, תדביק כאן את המפתח של ג'ימיני שלך בתוך המירכאות
 export const geminiConfig = {
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY
+  apiKey: "כאן_תדביק_את_המפתח_של_ג'ימיני" 
 };
