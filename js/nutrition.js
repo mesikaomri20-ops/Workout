@@ -1,8 +1,6 @@
 import { saveNutritionLog } from "./db.js";
 import { geminiConfig } from "./config.js";
 
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-
 export const analyzeNutritionNLP = async (text) => {
     const prompt = `
     Analyze the following Hebrew text describing a meal and return a structured JSON object.
@@ -19,13 +17,20 @@ export const analyzeNutritionNLP = async (text) => {
     If you're unsure, provide your best estimate. Do not include any text other than the JSON.
     `;
 
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey}`;
+    const body = {
+        contents: [{ parts: [{ text: prompt }] }]
+    };
+
+    console.log("Calling Gemini API (Nutrition)...");
+    console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
+    console.log("Request Body:", JSON.stringify(body, null, 2));
+
     try {
-        const response = await fetch(`${GEMINI_API_URL}?key=${geminiConfig.apiKey}`, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
-            })
+            body: JSON.stringify(body)
         });
 
         if (!response.ok) {

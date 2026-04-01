@@ -1,8 +1,6 @@
 import { geminiConfig } from "./config.js";
 import { getUserProfile, getWorkouts, getNutritionHistory } from "./db.js";
 
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-
 const SYSTEM_PROMPT = `
 Act as a performance coach for Omri, a finance analyst with an Economics background.
 Analyze his combined data (workouts, nutrition, Garmin Load) to provide concise, data-driven, motivational advice in Hebrew.
@@ -23,15 +21,22 @@ export const getCoachResponse = async (userMessage) => {
     User Query: "${userMessage}"
     `;
 
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey}`;
+    const body = {
+        contents: [
+            { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + context }] }
+        ]
+    };
+
+    console.log("Calling Gemini API (Coach)...");
+    console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
+    console.log("Request Body:", JSON.stringify(body, null, 2));
+
     try {
-        const response = await fetch(`${GEMINI_API_URL}?key=${geminiConfig.apiKey}`, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [
-                    { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + context }] }
-                ]
-            })
+            body: JSON.stringify(body)
         });
 
         if (!response.ok) {
