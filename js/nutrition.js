@@ -50,7 +50,8 @@ export const initNutritionModule = () => {
 
     if (!nutritionInput || !analyzeBtn || !resultDiv) return;
 
-    analyzeBtn.addEventListener('click', async () => {
+    analyzeBtn.addEventListener('click', async (e) => {
+        if (e) e.preventDefault();
         const text = nutritionInput.value.trim();
         if (!text) return;
 

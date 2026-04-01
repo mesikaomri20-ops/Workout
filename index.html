@@ -103,7 +103,7 @@
                         <label>עומס אימון (Garmin Load)</label>
                         <input type="number" id="training-load">
                     </div>
-                    <button type="submit" class="btn-primary">שמור אימון</button>
+                    <button id="save-workout-btn" type="button" class="btn-primary">שמור אימון</button>
                 </form>
             </div>
         </section>
@@ -115,7 +115,7 @@
                 <div class="form-group">
                     <textarea id="nutrition-input" rows="4" placeholder="אכלתי 200 גרם חזה עוף עם כוס אורז וסלט ירקות..."></textarea>
                 </div>
-                <button id="analyze-nutrition" class="btn-primary">נתח ארוחה</button>
+                <button id="analyze-nutrition" type="button" class="btn-primary">נתח ארוחה</button>
                 
                 <div id="nutrition-result" class="nutrition-result" style="display: none;">
                     <!-- Result from Gemini -->
@@ -131,7 +131,7 @@
                 </div>
                 <div class="chat-input-area">
                     <input type="text" id="coach-input" placeholder="שאל את המאמן...">
-                    <button id="send-to-coach" class="btn-primary">שלח</button>
+                    <button id="send-to-coach" type="button" class="btn-primary">שלח</button>
                 </div>
             </div>
         </section>
@@ -173,10 +173,10 @@
                             <option value="1.9">פעילות ספורטיבית אינטנסיבית</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn-primary">עדכן נתונים</button>
+                    <button id="save-profile-btn" type="button" class="btn-primary">עדכן נתונים</button>
                 </form>
             </div>
-            <button id="logout-btn" class="btn-secondary">התנתק</button>
+            <button id="logout-btn" type="button" class="btn-secondary">התנתק</button>
         </section>
     </main>
 
@@ -184,7 +184,7 @@
         <div class="modal-content luxury-card">
             <h2>התחברות</h2>
             <p>אנא התחבר כדי לסנכרן את הנתונים שלך</p>
-            <button id="google-login" class="btn-primary">התחבר עם Google</button>
+            <button id="google-login" type="button" class="btn-primary">התחבר עם Google</button>
         </div>
     </div>
 

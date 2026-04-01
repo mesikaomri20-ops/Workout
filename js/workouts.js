@@ -7,11 +7,13 @@ export const calculateStrengthScore = (reps, bandPower = 1) => {
 
 export const initWorkoutModule = () => {
     const workoutForm = document.getElementById('workout-form');
-    if (!workoutForm) return;
+    const saveBtn = document.getElementById('save-workout-btn');
+    
+    if (!workoutForm || !saveBtn) return;
 
-    workoutForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
+    saveBtn.addEventListener('click', async (e) => {
+        if (e) e.preventDefault();
+        
         // Sample logic for bodyweight/band sets
         const reps = 10; // This would normally come from a dynamic list of sets
         const bandPower = 0; // 0 for bodyweight

@@ -57,7 +57,8 @@ export const initCoachModule = () => {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     };
 
-    sendBtn.addEventListener('click', async () => {
+    sendBtn.addEventListener('click', async (e) => {
+        if (e) e.preventDefault();
         const text = coachInput.value.trim();
         if (!text) return;
 

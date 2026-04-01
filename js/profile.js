@@ -43,7 +43,10 @@ export const updateUIWithMetrics = (metrics) => {
 
 export const initProfileModule = async () => {
     const profileForm = document.getElementById('profile-form');
+    const saveBtn = document.getElementById('save-profile-btn');
     
+    if (!profileForm || !saveBtn) return;
+
     // Load existing profile
     const profile = await getUserProfile();
     if (profile) {
@@ -57,8 +60,8 @@ export const initProfileModule = async () => {
         updateUIWithMetrics(metrics);
     }
 
-    profileForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    saveBtn.addEventListener('click', async (e) => {
+        if (e) e.preventDefault();
         
         const profileData = {
             height: parseFloat(document.getElementById('profile-height').value),

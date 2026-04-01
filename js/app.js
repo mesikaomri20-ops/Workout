@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loadingOverlay) loadingOverlay.classList.add('hidden');
 
         if (user) {
+            console.log("User authenticated:", user.uid);
             // Hide login modal if user is authenticated
             authModal.classList.remove('active');
             userNameDisplay.textContent = user.displayName ? user.displayName.split(' ')[0] : 'עומרי';
@@ -49,22 +50,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } else {
+            console.log("User NOT authenticated");
             // Only show modal if user is definitely NOT logged in
-            // and we're not currently initializing or something
             authModal.classList.add('active');
             isInitialized = false; 
         }
     });
 
-    if (loginBtn) loginBtn.addEventListener('click', loginWithGoogle);
-    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+    if (loginBtn) {
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginWithGoogle();
+        });
+    }
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
+    }
 
     // View Switching
     const navItems = document.querySelectorAll('.nav-item');
     const views = document.querySelectorAll('.view');
 
     navItems.forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (e) => {
+            if (e) e.preventDefault();
             const viewId = item.getAttribute('data-view');
             
             // Update Nav
