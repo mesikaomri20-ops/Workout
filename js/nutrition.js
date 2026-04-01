@@ -1,5 +1,6 @@
-import { saveNutritionLog } from "./db.js";
+import { saveNutritionLog, getDailyNutritionLogs, deleteNutritionLog, getUserProfile } from "./db.js";
 import { geminiConfig } from "./config.js";
+import { calculateMetrics } from "./profile.js";
 
 export const analyzeNutritionNLP = async (text) => {
     const prompt = `
@@ -17,17 +18,11 @@ export const analyzeNutritionNLP = async (text) => {
     If you're unsure, provide your best estimate. Do not include any text other than the JSON.
     `;
 
-    // Force Local Config Usage
     const apiKey = geminiConfig.apiKey.trim();
-    console.log("Gemini 2.5 Flash Online");
-    console.log("API Key Source: config.js");
-
     const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const body = {
         contents: [{ parts: [{ text: prompt }] }]
     };
-
-    console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
 
     try {
         const response = await fetch(url, {
@@ -36,25 +31,12 @@ export const analyzeNutritionNLP = async (text) => {
             body: JSON.stringify(body)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Gemini API Error Details:", errorData);
-            throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
 
         const data = await response.json();
-        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-            console.error("Unexpected Gemini response structure:", data);
-            throw new Error("Invalid response from Gemini API");
-        }
-
         const responseText = data.candidates[0].content.parts[0].text;
-        
-        // Extract JSON (sometimes Gemini wraps it in code blocks)
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
-        }
+        if (jsonMatch) return JSON.parse(jsonMatch[0]);
         throw new Error("Could not parse AI response");
     } catch (error) {
         console.error("Gemini Error:", error);
@@ -62,12 +44,91 @@ export const analyzeNutritionNLP = async (text) => {
     }
 };
 
-export const initNutritionModule = () => {
+export const initNutritionModule = async () => {
     const nutritionInput = document.getElementById('nutrition-input');
     const analyzeBtn = document.getElementById('analyze-nutrition');
     const resultDiv = document.getElementById('nutrition-result');
+    const logsBody = document.getElementById('nutrition-logs-body');
+    
+    const caloriesTotalEl = document.getElementById('today-calories-total');
+    const remainingCaloriesEl = document.getElementById('remaining-calories');
+    const proteinTotalEl = document.getElementById('today-protein-total');
+    const carbsTotalEl = document.getElementById('today-carbs-total');
+    const fatsTotalEl = document.getElementById('today-fats-total');
 
-    if (!nutritionInput || !analyzeBtn || !resultDiv) return;
+    if (!nutritionInput || !analyzeBtn || !resultDiv || !logsBody) return;
+
+    const refreshDailySummary = async () => {
+        const today = new Date().toISOString().split('T')[0];
+        const logs = await getDailyNutritionLogs(today);
+        const profile = await getUserProfile();
+        const targets = calculateMetrics(profile);
+
+        // Sum totals
+        const totals = logs.reduce((acc, log) => {
+            acc.calories += log.calories || 0;
+            acc.protein += log.protein || 0;
+            acc.carbs += log.carbs || 0;
+            acc.fats += log.fats || 0;
+            return acc;
+        }, { calories: 0, protein: 0, carbs: 0, fats: 0 });
+
+        // Update Totals UI
+        caloriesTotalEl.textContent = Math.round(totals.calories);
+        proteinTotalEl.textContent = `${Math.round(totals.protein)}g`;
+        carbsTotalEl.textContent = `${Math.round(totals.carbs)}g`;
+        fatsTotalEl.textContent = `${Math.round(totals.fats)}g`;
+
+        // Update Remaining UI
+        if (targets.tdee !== '-') {
+            const remaining = targets.tdee - totals.calories;
+            remainingCaloriesEl.textContent = Math.round(remaining);
+            remainingCaloriesEl.className = remaining >= 0 ? 'value text-success' : 'value text-danger';
+        } else {
+            remainingCaloriesEl.textContent = '-';
+        }
+
+        // Render Table
+        logsBody.innerHTML = '';
+        logs.forEach(log => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${log.meal}</td>
+                <td>${Math.round(log.calories)}</td>
+                <td>${Math.round(log.protein)}g</td>
+                <td>${Math.round(log.carbs)}g</td>
+                <td>${Math.round(log.fats)}g</td>
+                <td>
+                    <button class="btn-edit" data-id="${log.id}">ערוך</button>
+                    <button class="btn-delete" data-id="${log.id}">מחק</button>
+                </td>
+            `;
+            logsBody.appendChild(tr);
+        });
+
+        // Add Listeners
+        logsBody.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm('למחוק רישום זה?')) {
+                    await deleteNutritionLog(btn.dataset.id);
+                    await refreshDailySummary();
+                }
+            });
+        });
+
+        logsBody.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const log = logs.find(l => l.id === btn.dataset.id);
+                if (log) {
+                    nutritionInput.value = `תיקון: אכלתי ${log.meal} (${log.calories} קלוריות, ${log.protein} חלבון, ${log.carbs} פחמימות, ${log.fats} שומן)`;
+                    nutritionInput.focus();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
+    };
+
+    await refreshDailySummary();
 
     analyzeBtn.addEventListener('click', async (e) => {
         if (e) e.preventDefault();
@@ -79,47 +140,32 @@ export const initNutritionModule = () => {
 
         try {
             const result = await analyzeNutritionNLP(text);
-            
-            // Display result
             resultDiv.style.display = 'block';
             resultDiv.innerHTML = `
                 <div class="luxury-card result-card">
                     <h3>סיכום ארוחה</h3>
                     <p><strong>ארוחה:</strong> ${result.meal}</p>
                     <div class="summary-stats">
-                        <div class="stat-item">
-                            <span class="label">קלוריות</span>
-                            <span class="value">${result.calories}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="label">חלבון</span>
-                            <span class="value">${result.protein}g</span>
-                        </div>
+                        <div class="stat-item"><span class="label">קלוריות</span><span class="value">${result.calories}</span></div>
+                        <div class="stat-item"><span class="label">חלבון</span><span class="value">${result.protein}g</span></div>
                     </div>
                     <div class="summary-stats">
-                        <div class="stat-item">
-                            <span class="label">פחמימות</span>
-                            <span class="value">${result.carbs}g</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="label">שומן</span>
-                            <span class="value">${result.fats}g</span>
-                        </div>
+                        <div class="stat-item"><span class="label">פחמימות</span><span class="value">${result.carbs}g</span></div>
+                        <div class="stat-item"><span class="label">שומן</span><span class="value">${result.fats}g</span></div>
                     </div>
-                    <button id="save-log" class="btn-primary" style="margin-top: 1rem;">שמור ביומן</button>
+                    <button id="save-log-btn" class="btn-primary" style="margin-top: 1rem;">שמור ביומן</button>
                 </div>
             `;
 
-            document.getElementById('save-log').addEventListener('click', async () => {
+            document.getElementById('save-log-btn').addEventListener('click', async () => {
                 await saveNutritionLog(result);
-                alert('הארוחה נשמרה ביומן');
+                alert('הארוחה נשמרה');
                 nutritionInput.value = '';
                 resultDiv.style.display = 'none';
+                await refreshDailySummary();
             });
-
         } catch (error) {
-            console.error("Detailed Nutrition Error:", error);
-            alert(`שגיאה בניתוח הארוחה: ${error.message}. בדוק את הקונסול לפרטים נוספים.`);
+            alert('שגיאה בניתוח הארוחה');
         } finally {
             analyzeBtn.disabled = false;
             analyzeBtn.textContent = 'נתח ארוחה';

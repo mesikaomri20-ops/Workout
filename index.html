@@ -130,6 +130,53 @@
                     <!-- Result from Gemini -->
                 </div>
             </div>
+
+            <div class="luxury-card">
+                <h3>סיכום יומי</h3>
+                <div class="summary-stats nutrition-summary">
+                    <div class="stat-item">
+                        <span class="label">סה"כ קלוריות</span>
+                        <span id="today-calories-total" class="value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">נותר ליעד</span>
+                        <span id="remaining-calories" class="value">0</span>
+                    </div>
+                </div>
+                <div class="summary-stats macros-summary">
+                    <div class="stat-item">
+                        <span class="label">חלבון</span>
+                        <span id="today-protein-total" class="value">0g</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">פחמימות</span>
+                        <span id="today-carbs-total" class="value">0g</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">שומן</span>
+                        <span id="today-fats-total" class="value">0g</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="luxury-card overflow-x-auto">
+                <h3>פירוט ארוחות היום</h3>
+                <table class="luxury-table" id="nutrition-logs-table">
+                    <thead>
+                        <tr>
+                            <th>ארוחה</th>
+                            <th>קלוריות</th>
+                            <th>חלבון</th>
+                            <th>פחמימות</th>
+                            <th>שומן</th>
+                            <th>פעולות</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nutrition-logs-body">
+                        <!-- Logs will be injected here -->
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <section id="view-coach" class="view">
