@@ -8,5 +8,5 @@ export const firebaseConfig = {
 };
 
 export const geminiConfig = {
-  apiKey: "AIzaSyCtKumxPwVwkFio_i6yAP6YIKwJZ4OE7qY"
+  apiKey: "AIzaSyDrHtHdVDk1iky1zzx3_9YrReNf9lCvgpg"
 };
