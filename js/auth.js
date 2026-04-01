@@ -1,5 +1,9 @@
 import { auth, provider, signInWithPopup } from './db.js';
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "firebase/auth";
+
+// Ensure session persistence is set to local
+setPersistence(auth, browserLocalPersistence)
+    .catch((error) => console.error("Persistence error:", error));
 
 export const loginWithGoogle = async () => {
     try {

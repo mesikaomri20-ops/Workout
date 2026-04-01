@@ -229,6 +229,42 @@ input:focus, textarea:focus {
 .ms-auto { margin-inline-start: auto; }
 .me-auto { margin-inline-end: auto; }
 
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid var(--accent-color);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
 /* Chat Styles */
 .chat-container {
     height: 300px;

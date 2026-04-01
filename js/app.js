@@ -3,7 +3,7 @@ import { initProfileModule, calculateMetrics, updateUIWithMetrics } from "./prof
 import { initWorkoutModule } from "./workouts.js";
 import { initNutritionModule } from "./nutrition.js";
 import { initCoachModule } from "./coach.js";
-import { getUserProfile } from "./db.js";
+import { getUserProfile, auth } from "./db.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     // Auth State Handling
@@ -11,26 +11,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('google-login');
     const logoutBtn = document.getElementById('logout-btn');
     const userNameDisplay = document.getElementById('user-name-display');
+    const loadingOverlay = document.getElementById('loading-overlay');
+
+    let isInitialized = false;
+
+    // Initial check: if Firebase already has a user, hide the modal immediately
+    // but we still rely on observeAuth for the source of truth
+    // Check if user is already logged in (for faster UI response)
+    if (auth.currentUser) {
+        authModal.classList.remove('active');
+    }
 
     observeAuth(async (user) => {
+        // Hide loading overlay once auth state is determined
+        if (loadingOverlay) loadingOverlay.classList.add('hidden');
+
         if (user) {
+            // Hide login modal if user is authenticated
             authModal.classList.remove('active');
             userNameDisplay.textContent = user.displayName ? user.displayName.split(' ')[0] : 'עומרי';
             
-            // Initialize Modules
-            await initProfileModule();
-            initWorkoutModule();
-            initNutritionModule();
-            initCoachModule();
+            // Initialize Modules ONLY ONCE
+            if (!isInitialized) {
+                isInitialized = true;
+                try {
+                    await initProfileModule();
+                    initWorkoutModule();
+                    initNutritionModule();
+                    initCoachModule();
 
-            // Initial UI Update
-            const profile = await getUserProfile();
-            if (profile) {
-                const metrics = calculateMetrics(profile);
-                updateUIWithMetrics(metrics);
+                    // Initial UI Update
+                    const profile = await getUserProfile();
+                    if (profile) {
+                        const metrics = calculateMetrics(profile);
+                        updateUIWithMetrics(metrics);
+                    }
+                } catch (err) {
+                    console.error("Initialization error:", err);
+                }
             }
         } else {
+            // Only show modal if user is definitely NOT logged in
+            // and we're not currently initializing or something
             authModal.classList.add('active');
+            isInitialized = false; 
         }
     });
 
