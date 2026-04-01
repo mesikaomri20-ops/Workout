@@ -17,31 +17,20 @@ export const analyzeNutritionNLP = async (text) => {
     If you're unsure, provide your best estimate. Do not include any text other than the JSON.
     `;
 
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey.trim()}`;
     const body = {
         contents: [{ parts: [{ text: prompt }] }]
     };
 
-    const tryGeminiRequest = async (modelName) => {
-        const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${geminiConfig.apiKey.trim()}`;
-        console.log(`Calling Gemini API v1 (${modelName})...`);
-        console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
+    console.log("Attempting stable login to Gemini 1.5 Flash...");
+    console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
 
+    try {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
-        return response;
-    };
-
-    try {
-        let response = await tryGeminiRequest('gemini-3-flash');
-
-        // Fallback if 404
-        if (response.status === 404) {
-            console.warn("gemini-3-flash returned 404. Trying fallback gemini-3-7b...");
-            response = await tryGeminiRequest('gemini-3-7b');
-        }
 
         if (!response.ok) {
             const errorData = await response.json();
