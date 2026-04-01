@@ -1,4 +1,3 @@
-// Firebase Configuration
 export const firebaseConfig = {
   apiKey: "AIzaSyC6-XIIXt4yNnRWhXGbWBFx9keiUMBeKcU",
   authDomain: "workout-31162.firebaseapp.com",
@@ -8,7 +7,6 @@ export const firebaseConfig = {
   appId: "1:726599082881:web:94b3ef1598c64f10063e80"
 };
 
-// Gemini API Configuration
 export const geminiConfig = {
   apiKey: "AIzaSyD8fCcXJvCsFIbqEc4XSkAXx17GxK_kyzE"
 };
