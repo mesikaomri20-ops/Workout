@@ -23,6 +23,7 @@ export const getCoachResponse = async (userMessage) => {
 
     // Force Local Config Usage
     const apiKey = geminiConfig.apiKey.trim();
+    console.log("System Ready: Using Workout Project Key");
     console.log("API Key Source: config.js");
     console.log("Attempting stable login to Gemini 1.5 Flash (v1beta)...");
 
