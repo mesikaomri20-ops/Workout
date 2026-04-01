@@ -24,3 +24,14 @@ export const observeAuth = (callback) => {
 };
 
 export { auth };
+export const loginWithGoogle = async () => {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        return result.user;
+    } catch (error) {
+        console.error("Auth Error:", error);
+        // השורה הזו תגיד לנו בדיוק מה קורה:
+        alert("שגיאת התחברות: " + error.code + "\n" + error.message);
+        throw error;
+    }
+};
