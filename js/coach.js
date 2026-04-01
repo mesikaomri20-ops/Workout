@@ -23,10 +23,10 @@ export const getCoachResponse = async (userMessage) => {
 
     // Force Local Config Usage
     const apiKey = geminiConfig.apiKey.trim();
-    console.log("Gemini 2.5 Flash Online");
+    console.log("Calling Gemini 2.5 Flash (v1beta)...");
     console.log("API Key Source: config.js");
 
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const body = {
         contents: [
             { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + context }] }
@@ -38,14 +38,16 @@ export const getCoachResponse = async (userMessage) => {
     try {
         const response = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(body)
         });
 
         if (!response.ok) {
             const errorData = await response.json();
             console.error("Gemini Coach API Error Details:", errorData);
-            throw new Error(`Gemini API error: ${response.status}`);
+            throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();

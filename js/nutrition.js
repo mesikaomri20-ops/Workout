@@ -19,19 +19,28 @@ export const analyzeNutritionNLP = async (text) => {
     `;
 
     const apiKey = geminiConfig.apiKey.trim();
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const body = {
         contents: [{ parts: [{ text: prompt }] }]
     };
 
+    console.log("Calling Gemini 2.5 Flash (v1beta)...");
+    console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
+
     try {
         const response = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(body)
         });
 
-        if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Gemini API Error Details:", errorData);
+            throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+        }
 
         const data = await response.json();
         const responseText = data.candidates[0].content.parts[0].text;
