@@ -507,6 +507,27 @@ input:focus, textarea:focus {
     color: var(--accent-color);
 }
 
+.date-group-header {
+    background: rgba(225, 29, 72, 0.05);
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.date-group-header td {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.8rem;
+    text-align: right;
+}
+
+.current-day-row {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.date-cell {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
 /* Status Colors */
 .text-success { color: #10B981 !important; } /* Green */
 .text-danger { color: #EF4444 !important; }  /* Red */

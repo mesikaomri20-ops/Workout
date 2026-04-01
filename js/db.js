@@ -70,6 +70,23 @@ export const getDailyNutritionLogs = async (dateStr) => {
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+export const getNutritionLogsRange = async (startDate, endDate) => {
+    const user = auth.currentUser;
+    if (!user) return [];
+    
+    const { where } = await import("firebase/firestore");
+    const nutritionCollectionRef = collection(db, "users", user.uid, "nutritionLogs");
+    const q = query(
+        nutritionCollectionRef, 
+        where("logDate", ">=", startDate),
+        where("logDate", "<=", endDate),
+        orderBy("logDate", "desc"),
+        orderBy("timestamp", "desc")
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
 export const deleteNutritionLog = async (logId) => {
     const user = auth.currentUser;
     if (!user) return;

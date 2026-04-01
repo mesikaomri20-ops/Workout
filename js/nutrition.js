@@ -1,4 +1,4 @@
-import { saveNutritionLog, getDailyNutritionLogs, deleteNutritionLog, getUserProfile } from "./db.js";
+import { saveNutritionLog, getDailyNutritionLogs, getNutritionLogsRange, deleteNutritionLog, getUserProfile } from "./db.js";
 import { geminiConfig } from "./config.js";
 import { calculateMetrics } from "./profile.js";
 
@@ -65,12 +65,24 @@ export const initNutritionModule = async () => {
 
     const refreshDailySummary = async () => {
         const selectedDate = datePicker.value;
-        const logs = await getDailyNutritionLogs(selectedDate);
+        
+        // Calculate 7-day range
+        const endDate = selectedDate;
+        const startDateObj = new Date(selectedDate);
+        startDateObj.setDate(startDateObj.getDate() - 7);
+        const startDate = startDateObj.toISOString().split('T')[0];
+
+        // Fetch logs for totals (Selected Day Only)
+        const dailyLogs = await getDailyNutritionLogs(selectedDate);
+        
+        // Fetch logs for table (7-day range)
+        const historyLogs = await getNutritionLogsRange(startDate, endDate);
+
         const profile = await getUserProfile();
         const targets = calculateMetrics(profile);
 
-        // Sum totals
-        const totals = logs.reduce((acc, log) => {
+        // Sum totals for selected day
+        const totals = dailyLogs.reduce((acc, log) => {
             acc.calories += log.calories || 0;
             acc.protein += log.protein || 0;
             acc.carbs += log.carbs || 0;
@@ -93,11 +105,24 @@ export const initNutritionModule = async () => {
             remainingCaloriesEl.textContent = '-';
         }
 
-        // Render Table
+        // Render Table (History)
         logsBody.innerHTML = '';
-        logs.forEach(log => {
+        let lastDate = null;
+
+        historyLogs.forEach(log => {
+            // Add date separator
+            if (log.logDate !== lastDate) {
+                const separatorTr = document.createElement('tr');
+                separatorTr.className = 'date-group-header';
+                separatorTr.innerHTML = `<td colspan="7">${formatHebrewDate(log.logDate)}</td>`;
+                logsBody.appendChild(separatorTr);
+                lastDate = log.logDate;
+            }
+
             const tr = document.createElement('tr');
+            tr.className = log.logDate === selectedDate ? 'current-day-row' : '';
             tr.innerHTML = `
+                <td class="date-cell">${formatDateCompact(log.logDate)}</td>
                 <td>${log.meal}</td>
                 <td>${Math.round(log.calories)}</td>
                 <td>${Math.round(log.protein)}g</td>
@@ -123,14 +148,27 @@ export const initNutritionModule = async () => {
 
         logsBody.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', () => {
-                const log = logs.find(l => l.id === btn.dataset.id);
+                const log = historyLogs.find(l => l.id === btn.dataset.id);
                 if (log) {
                     nutritionInput.value = `תיקון: אכלתי ${log.meal} (${log.calories} קלוריות, ${log.protein} חלבון, ${log.carbs} פחמימות, ${log.fats} שומן)`;
+                    datePicker.value = log.logDate; // Ensure we save to the original date
                     nutritionInput.focus();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             });
         });
+    };
+
+    // Helper: Format date for separators
+    const formatHebrewDate = (dateStr) => {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateStr).toLocaleDateString('he-IL', options);
+    };
+
+    // Helper: Format date for cells
+    const formatDateCompact = (dateStr) => {
+        const d = new Date(dateStr);
+        return `${d.getDate()}/${d.getMonth() + 1}`;
     };
 
     // Refresh when date changes
