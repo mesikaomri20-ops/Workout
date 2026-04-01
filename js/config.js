@@ -1,4 +1,4 @@
-// Firebase Configuration - Hardcoded for immediate fix
+// Firebase Configuration
 export const firebaseConfig = {
   apiKey: "AIzaSyC6-XIIXt4yNnRWhXGbWBFx9keiUMBeKcU",
   authDomain: "workout-31162.firebaseapp.com",
@@ -9,7 +9,6 @@ export const firebaseConfig = {
 };
 
 // Gemini API Configuration
-// עומרי, תדביק כאן את המפתח של ג'ימיני שלך בתוך המירכאות
 export const geminiConfig = {
-  apiKey: "כאן_תדביק_את_המפתח_של_ג'ימיני" 
+  apiKey: "AIzaSyD8fCcXJvCsFIbqEc4XSkAXx17GxK_kyzE"
 };
