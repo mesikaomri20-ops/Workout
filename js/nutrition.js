@@ -17,12 +17,16 @@ export const analyzeNutritionNLP = async (text) => {
     If you're unsure, provide your best estimate. Do not include any text other than the JSON.
     `;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey.trim()}`;
+    // Force Local Config Usage
+    const apiKey = geminiConfig.apiKey.trim();
+    console.log("API Key Source: config.js");
+    console.log("Attempting stable login to Gemini 1.5 Flash (v1beta)...");
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
     const body = {
         contents: [{ parts: [{ text: prompt }] }]
     };
 
-    console.log("Attempting stable login to Gemini 1.5 Flash...");
     console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
 
     try {
