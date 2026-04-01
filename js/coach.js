@@ -21,23 +21,33 @@ export const getCoachResponse = async (userMessage) => {
     User Query: "${userMessage}"
     `;
 
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey.trim()}`;
     const body = {
         contents: [
             { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + context }] }
         ]
     };
 
-    console.log("Calling Gemini API v1 (Coach)...");
-    console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
-    console.log("Request Body:", JSON.stringify(body, null, 2));
+    const tryGeminiRequest = async (modelName) => {
+        const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${geminiConfig.apiKey.trim()}`;
+        console.log(`Calling Gemini API v1 (${modelName})...`);
+        console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
 
-    try {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
+        return response;
+    };
+
+    try {
+        let response = await tryGeminiRequest('gemini-3-flash');
+
+        // Fallback if 404
+        if (response.status === 404) {
+            console.warn("gemini-3-flash returned 404. Trying fallback gemini-3-7b...");
+            response = await tryGeminiRequest('gemini-3-7b');
+        }
 
         if (!response.ok) {
             const errorData = await response.json();
