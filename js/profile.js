@@ -1,9 +1,18 @@
 import { saveUserProfile, getUserProfile } from "./db.js";
 
 export const calculateMetrics = (profile) => {
+    if (!profile || !profile.weight || !profile.height || !profile.age || !profile.gender || !profile.activity) {
+        return {
+            bmi: '-',
+            bmr: '-',
+            tdee: '-',
+            proteinTarget: '-'
+        };
+    }
+
     const { weight, height, age, gender, activity } = profile;
     
-    // BMI
+    // BMI: weight / (height/100)^2
     const heightInMeters = height / 100;
     const bmi = weight / (heightInMeters * heightInMeters);
 
@@ -15,11 +24,11 @@ export const calculateMetrics = (profile) => {
         bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
     }
 
-    // TDEE
+    // TDEE: BMR * Activity Factor
     const tdee = bmr * parseFloat(activity);
 
-    // Protein Target (2g per kg)
-    const proteinTarget = weight * 2.0;
+    // Protein Goal: weight * 1.8
+    const proteinTarget = weight * 1.8;
 
     return {
         bmi: bmi.toFixed(1),
@@ -36,7 +45,7 @@ export const updateUIWithMetrics = (metrics) => {
     const homeBmr = document.getElementById('home-bmr');
 
     if (dailyCalories) dailyCalories.textContent = metrics.tdee;
-    if (dailyProtein) dailyProtein.textContent = `${metrics.proteinTarget}g`;
+    if (dailyProtein) dailyProtein.textContent = metrics.proteinTarget === '-' ? '-' : `${metrics.proteinTarget}g`;
     if (homeBmi) homeBmi.textContent = metrics.bmi;
     if (homeBmr) homeBmr.textContent = metrics.bmr;
 };
@@ -50,14 +59,17 @@ export const initProfileModule = async () => {
     // Load existing profile
     const profile = await getUserProfile();
     if (profile) {
-        document.getElementById('profile-height').value = profile.height || 191;
-        document.getElementById('profile-weight').value = profile.weight || 87;
+        document.getElementById('profile-height').value = profile.height || '';
+        document.getElementById('profile-weight').value = profile.weight || '';
         document.getElementById('profile-age').value = profile.age || "";
         document.getElementById('profile-gender').value = profile.gender || "male";
         document.getElementById('profile-activity').value = profile.activity || "1.2";
         
         const metrics = calculateMetrics(profile);
         updateUIWithMetrics(metrics);
+    } else {
+        // If no profile, still call update to show default state ('-')
+        updateUIWithMetrics(calculateMetrics(null));
     }
 
     saveBtn.addEventListener('click', async (e) => {

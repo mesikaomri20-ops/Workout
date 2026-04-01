@@ -41,10 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Initial UI Update
                     const profile = await getUserProfile();
-                    if (profile) {
-                        const metrics = calculateMetrics(profile);
-                        updateUIWithMetrics(metrics);
-                    }
+                    const metrics = calculateMetrics(profile);
+                    updateUIWithMetrics(metrics);
                 } catch (err) {
                     console.error("Initialization error:", err);
                 }
