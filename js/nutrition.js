@@ -49,6 +49,7 @@ export const initNutritionModule = async () => {
     const analyzeBtn = document.getElementById('analyze-nutrition');
     const resultDiv = document.getElementById('nutrition-result');
     const logsBody = document.getElementById('nutrition-logs-body');
+    const datePicker = document.getElementById('nutrition-date-picker');
     
     const caloriesTotalEl = document.getElementById('today-calories-total');
     const remainingCaloriesEl = document.getElementById('remaining-calories');
@@ -56,11 +57,15 @@ export const initNutritionModule = async () => {
     const carbsTotalEl = document.getElementById('today-carbs-total');
     const fatsTotalEl = document.getElementById('today-fats-total');
 
-    if (!nutritionInput || !analyzeBtn || !resultDiv || !logsBody) return;
+    if (!nutritionInput || !analyzeBtn || !resultDiv || !logsBody || !datePicker) return;
+
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    datePicker.value = today;
 
     const refreshDailySummary = async () => {
-        const today = new Date().toISOString().split('T')[0];
-        const logs = await getDailyNutritionLogs(today);
+        const selectedDate = datePicker.value;
+        const logs = await getDailyNutritionLogs(selectedDate);
         const profile = await getUserProfile();
         const targets = calculateMetrics(profile);
 
@@ -128,6 +133,9 @@ export const initNutritionModule = async () => {
         });
     };
 
+    // Refresh when date changes
+    datePicker.addEventListener('change', refreshDailySummary);
+
     await refreshDailySummary();
 
     analyzeBtn.addEventListener('click', async (e) => {
@@ -158,7 +166,8 @@ export const initNutritionModule = async () => {
             `;
 
             document.getElementById('save-log-btn').addEventListener('click', async () => {
-                await saveNutritionLog(result);
+                const selectedDate = datePicker.value;
+                await saveNutritionLog(result, selectedDate);
                 alert('הארוחה נשמרה');
                 nutritionInput.value = '';
                 resultDiv.style.display = 'none';

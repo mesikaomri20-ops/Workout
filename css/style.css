@@ -439,6 +439,28 @@ input:focus, textarea:focus {
     width: 100%;
 }
 
+/* Header with Action */
+.header-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.header-with-action h2 {
+    margin-bottom: 0;
+}
+
+.date-picker-small {
+    width: auto;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 0.5rem;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
 /* Table Styles */
 .overflow-x-auto {
     overflow-x: auto;

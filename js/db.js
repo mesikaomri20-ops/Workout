@@ -43,29 +43,27 @@ export const getWorkouts = async (limitCount = 10) => {
 };
 
 // Nutrition Functions
-export const saveNutritionLog = async (logData) => {
+export const saveNutritionLog = async (logData, customDate = null) => {
     const user = auth.currentUser;
     if (!user) return;
     const nutritionCollectionRef = collection(db, "users", user.uid, "nutritionLogs");
-    await addDoc(nutritionCollectionRef, { ...logData, timestamp: new Date() });
+    const dataToSave = { 
+        ...logData, 
+        timestamp: new Date(),
+        logDate: customDate || new Date().toISOString().split('T')[0] // YYYY-MM-DD
+    };
+    await addDoc(nutritionCollectionRef, dataToSave);
 };
 
 export const getDailyNutritionLogs = async (dateStr) => {
     const user = auth.currentUser;
     if (!user) return [];
     
-    // dateStr expected in YYYY-MM-DD format
-    const startOfDay = new Date(dateStr);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(dateStr);
-    endOfDay.setHours(23, 59, 59, 999);
-
     const { where } = await import("firebase/firestore");
     const nutritionCollectionRef = collection(db, "users", user.uid, "nutritionLogs");
     const q = query(
         nutritionCollectionRef, 
-        where("timestamp", ">=", startOfDay),
-        where("timestamp", "<=", endOfDay),
+        where("logDate", "==", dateStr),
         orderBy("timestamp", "asc")
     );
     const querySnapshot = await getDocs(q);
