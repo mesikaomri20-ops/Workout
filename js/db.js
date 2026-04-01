@@ -1,7 +1,13 @@
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, orderBy, getDocs, limit } from "firebase/firestore";
-import { auth } from "./auth.js";
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, orderBy, getDocs, limit } from "firebase/firestore";
+import { firebaseConfig } from "./config.js";
 
-const db = getFirestore();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
 // User Profile Functions
 export const saveUserProfile = async (profileData) => {
@@ -53,4 +59,4 @@ export const getNutritionHistory = async (limitCount = 10) => {
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
-export { db };
+export { auth, db, provider, signInWithPopup };

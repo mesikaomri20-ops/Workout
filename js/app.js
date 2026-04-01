@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     observeAuth(async (user) => {
         if (user) {
             authModal.classList.remove('active');
-            userNameDisplay.textContent = user.displayName.split(' ')[0];
+            userNameDisplay.textContent = user.displayName ? user.displayName.split(' ')[0] : 'עומרי';
             
             // Initialize Modules
             await initProfileModule();
@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    loginBtn.addEventListener('click', loginWithGoogle);
-    logoutBtn.addEventListener('click', logout);
+    if (loginBtn) loginBtn.addEventListener('click', loginWithGoogle);
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
     // View Switching
     const navItems = document.querySelectorAll('.nav-item');
@@ -69,15 +69,17 @@ document.addEventListener('DOMContentLoaded', () => {
         body.classList.add('light-theme');
     }
 
-    themeToggle.addEventListener('click', () => {
-        if (body.classList.contains('dark-theme')) {
-            body.classList.replace('dark-theme', 'light-theme');
-            localStorage.setItem('theme', 'light');
-        } else {
-            body.classList.replace('light-theme', 'dark-theme');
-            localStorage.setItem('theme', 'dark');
-        }
-    });
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('dark-theme')) {
+                body.classList.replace('dark-theme', 'light-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.replace('light-theme', 'dark-theme');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    }
 
     // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {

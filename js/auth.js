@@ -1,4 +1,5 @@
 import { auth, provider, signInWithPopup } from './db.js';
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 export const loginWithGoogle = async () => {
     try {
@@ -6,12 +7,15 @@ export const loginWithGoogle = async () => {
         return result.user;
     } catch (error) {
         console.error("Auth Error:", error);
-        // זה יקפיץ הודעה אם גוגל עדיין חוסם אותנו
         alert("שגיאת התחברות: " + error.code + "\n" + error.message);
         throw error;
     }
 };
 
-export const logoutUser = () => {
-    return auth.signOut();
+export const logout = () => {
+    return signOut(auth);
+};
+
+export const observeAuth = (callback) => {
+    onAuthStateChanged(auth, callback);
 };

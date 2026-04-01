@@ -48,6 +48,8 @@ export const initNutritionModule = () => {
     const analyzeBtn = document.getElementById('analyze-nutrition');
     const resultDiv = document.getElementById('nutrition-result');
 
+    if (!nutritionInput || !analyzeBtn || !resultDiv) return;
+
     analyzeBtn.addEventListener('click', async () => {
         const text = nutritionInput.value.trim();
         if (!text) return;

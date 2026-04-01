@@ -30,10 +30,15 @@ export const calculateMetrics = (profile) => {
 };
 
 export const updateUIWithMetrics = (metrics) => {
-    document.getElementById('daily-calories-target').textContent = metrics.tdee;
-    document.getElementById('daily-protein-target').textContent = `${metrics.proteinTarget}g`;
-    document.getElementById('home-bmi').textContent = metrics.bmi;
-    document.getElementById('home-bmr').textContent = metrics.bmr;
+    const dailyCalories = document.getElementById('daily-calories-target');
+    const dailyProtein = document.getElementById('daily-protein-target');
+    const homeBmi = document.getElementById('home-bmi');
+    const homeBmr = document.getElementById('home-bmr');
+
+    if (dailyCalories) dailyCalories.textContent = metrics.tdee;
+    if (dailyProtein) dailyProtein.textContent = `${metrics.proteinTarget}g`;
+    if (homeBmi) homeBmi.textContent = metrics.bmi;
+    if (homeBmr) homeBmr.textContent = metrics.bmr;
 };
 
 export const initProfileModule = async () => {

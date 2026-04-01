@@ -47,6 +47,8 @@ export const initCoachModule = () => {
     const sendBtn = document.getElementById('send-to-coach');
     const chatContainer = document.getElementById('coach-chat');
 
+    if (!coachInput || !sendBtn || !chatContainer) return;
+
     const appendMessage = (text, type) => {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${type}`;

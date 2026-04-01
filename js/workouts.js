@@ -7,6 +7,7 @@ export const calculateStrengthScore = (reps, bandPower = 1) => {
 
 export const initWorkoutModule = () => {
     const workoutForm = document.getElementById('workout-form');
+    if (!workoutForm) return;
 
     workoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
