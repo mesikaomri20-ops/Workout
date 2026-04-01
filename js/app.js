@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isInitialized = false;
 
-    // Initial check: if Firebase already has a user, hide the modal immediately
-    // but we still rely on observeAuth for the source of truth
     // Check if user is already logged in (for faster UI response)
     if (auth.currentUser) {
         authModal.classList.remove('active');
