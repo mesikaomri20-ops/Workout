@@ -21,14 +21,14 @@ export const getCoachResponse = async (userMessage) => {
     User Query: "${userMessage}"
     `;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey.trim()}`;
     const body = {
         contents: [
             { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + context }] }
         ]
     };
 
-    console.log("Calling Gemini API (Coach)...");
+    console.log("Calling Gemini API v1 (Coach)...");
     console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
     console.log("Request Body:", JSON.stringify(body, null, 2));
 

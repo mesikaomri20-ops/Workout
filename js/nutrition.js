@@ -17,12 +17,12 @@ export const analyzeNutritionNLP = async (text) => {
     If you're unsure, provide your best estimate. Do not include any text other than the JSON.
     `;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiConfig.apiKey.trim()}`;
     const body = {
         contents: [{ parts: [{ text: prompt }] }]
     };
 
-    console.log("Calling Gemini API (Nutrition)...");
+    console.log("Calling Gemini API v1 (Nutrition)...");
     console.log("URL:", url.replace(/key=.*$/, "key=HIDDEN"));
     console.log("Request Body:", JSON.stringify(body, null, 2));
 
